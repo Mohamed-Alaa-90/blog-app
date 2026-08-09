@@ -56,10 +56,22 @@ class PostController extends Controller
             ...$validated,
             'user_id' => $request->user()->id
         ]);
+
+        try {
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $path = $image->store('posts', 'public');
+
+                    $post->images()->create(['image' => $path]);
+                }
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
         return response()->json([
             'status' => 'success',
             'message' => 'post created successfully',
-            'data' => $post
+            'data' => $post->load('images')
         ]);
     }
 
