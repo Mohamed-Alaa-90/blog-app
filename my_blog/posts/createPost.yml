@@ -1,0 +1,31 @@
+info:
+  name: createPost
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: http://127.0.0.1:8000/api/posts
+  body:
+    type: multipart-form
+    data:
+      - name: title
+        type: text
+        value: Test Pos_2
+      - name: content
+        type: text
+        value: This is a test post_2
+      - name: images[]
+        type: file
+        value:
+          - C:\Users\FCBA03\Downloads\images.png
+        contentType: image/png
+  auth:
+    type: bearer
+    token: 4|b0G9jrS2gd3NoKESEgN8J903x7G7gAvtDCJPcHt0fc26b288
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
