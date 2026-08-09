@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PostIndexRequest;
 use App\Http\Requests\StorePostRequest;
 use App\Models\Post;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -51,28 +54,39 @@ class PostController extends Controller
     public function store(StorePostRequest $request)
     {
         $validated = $request->validated();
-
-        $post = Post::create([
-            ...$validated,
-            'user_id' => $request->user()->id
-        ]);
-
+        $uploadedImages = [];
         try {
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $path = $image->store('posts', 'public');
+            $post = DB::transaction(function () use ($validated, $request, &$uploadedImages) {
 
-                    $post->images()->create(['image' => $path]);
+                $postCreated = Post::create([
+                    ...$validated,
+                    'user_id' => $request->user()->id
+                ]);
+
+                if ($request->hasFile('images')) {
+                    foreach ($request->file('images') as $image) {
+                        $path = $image->store('posts', 'public');
+                        $uploadedImages[] = $path;
+                        $postCreated->images()->create(['image' => $path]);
+                    }
                 }
+
+
+                return $postCreated;
+
+            });
+        } catch (\Throwable $e) {
+            foreach ($uploadedImages as $path) {
+                Storage::disk('public')->delete($path);
             }
-        } catch (\Throwable $th) {
-            //throw $th;
+
+            throw $e;
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'post created successfully',
-            'data' => $post->load('images')
-        ]);
+            'message' => 'Post created successfully',
+            'data' => $post->load('images'),
+        ], 201);
     }
 
 }
