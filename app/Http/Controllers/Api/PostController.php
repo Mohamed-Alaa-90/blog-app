@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostIndexRequest;
 use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
@@ -91,6 +93,17 @@ class PostController extends Controller
             'message' => 'Post created successfully',
             'data' => $post->load('images'),
         ], 201);
+    }
+    public function update(UpdatePostRequest $requset, Post $post)
+    {
+        Gate::authorize('update', $post);
+        $post->update($requset->validated());
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Updated Post Successfully',
+            'data' => $post
+        ]);
     }
 
 }

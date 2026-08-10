@@ -1,10 +1,12 @@
 <?php
 
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -33,5 +35,12 @@ return Application::configure(basePath: dirname(__DIR__))
                     'message' => $model . ' not found',
                 ], 404);
             }
+        });
+
+        $exceptions->render(function (AccessDeniedHttpException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'You are not authorized to perform this action.',
+            ], 403);
         });
     })->create();
