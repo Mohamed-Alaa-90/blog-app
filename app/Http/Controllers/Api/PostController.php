@@ -43,7 +43,11 @@ class PostController extends Controller
     }
     public function show(Post $post)
     {
-        $post->loadMissing('user:id,name');
+        $post->loadMissing([
+            'user:id,name',
+            'comments',
+            'images'
+        ]);
 
         return response()->json([
             'status' => 'success',
