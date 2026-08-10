@@ -108,17 +108,18 @@ class PostController extends Controller
     public function destroy(Request $request, Post $post)
     {
         Gate::authorize('delete', $post);
-        $images = $post->images;
-        foreach ($images as $image) {
-            Storage::disk('public')->delete($image->image);
-        }
+        $images = $post->images()->pluck('image');
 
-        $post->delete();
+        DB::transaction(function () use ($post) {
+            $post->delete();
+        });
+        foreach ($images as $image) {
+            Storage::disk('public')->delete($image);
+        }
 
         return response()->json([
             'status' => 'success',
             'message' => 'Deleted Post Successfully',
-            'data' => []
         ]);
 
     }
