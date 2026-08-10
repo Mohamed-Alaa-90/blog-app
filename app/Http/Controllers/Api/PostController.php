@@ -105,5 +105,22 @@ class PostController extends Controller
             'data' => $post
         ]);
     }
+    public function destroy(Request $request, Post $post)
+    {
+        Gate::authorize('delete', $post);
+        $images = $post->images;
+        foreach ($images as $image) {
+            Storage::disk('public')->delete($image->image);
+        }
+
+        $post->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Deleted Post Successfully',
+            'data' => []
+        ]);
+
+    }
 
 }
