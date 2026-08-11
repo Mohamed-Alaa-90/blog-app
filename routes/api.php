@@ -28,5 +28,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //image
     Route::post('/posts/{post}/images', [ImageController::class, 'store']);
-    Route::delete('/posts/{post}/images/{image}', [ImageController::class, 'destroy']);
+    Route::delete('/posts/{post}/images/{image}', [ImageController::class, 'destroy'])->scopeBindings();
 });

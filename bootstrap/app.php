@@ -1,8 +1,7 @@
 <?php
 
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -29,10 +28,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (NotFoundHttpException $e) {
             if ($e->getPrevious() instanceof ModelNotFoundException) {
-                $model = class_basename($e->getPrevious()->getModel());
                 return response()->json([
                     'status' => 'error',
-                    'message' => $model . ' not found',
+                    'message' => class_basename(
+                        $e->getPrevious()->getModel()
+                    ) . ' not found',
                 ], 404);
             }
         });
@@ -42,5 +42,16 @@ return Application::configure(basePath: dirname(__DIR__))
                 'status' => 'error',
                 'message' => 'You are not authorized to perform this action.',
             ], 403);
+        });
+
+        $exceptions->render(function (\Throwable $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => app()->isProduction()
+                        ? 'Server error'
+                        : $e->getMessage(),
+                ], 500);
+            }
         });
     })->create();

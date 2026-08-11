@@ -42,12 +42,12 @@ class AuthController extends Controller
                 'message' => 'email or password error'
             ], 401);
         }
-        $token = $user->createToken('login_tokn')->plainTextToken;
+        $token = $user->createToken('login_token')->plainTextToken;
 
         return response()->json(
             [
-                'message' => 'login successflly',
-                'user' => $user,
+                'message' => 'login successfully',
+                'user' => $user->only(['id', 'name', 'email']),
                 'token' => $token
             ]
 
@@ -59,7 +59,7 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['Logout successflly']);
+        return response()->json(['Logout successfully']);
     }
     public function me(Request $request)
     {

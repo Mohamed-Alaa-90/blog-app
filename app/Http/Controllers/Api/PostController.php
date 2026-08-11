@@ -24,10 +24,9 @@ class PostController extends Controller
         $posts = Post::select('id', 'title', 'content', 'user_id', 'created_at')
             ->with([
                 'user:id,name',
-                'comments:id,user_id,post_id,content,created_at',
-                'comments.user:id,name',
                 'images:id,post_id,image'
             ])
+            ->withCount('comments')
             ->latest()
             ->paginate($perPage);
 
@@ -49,9 +48,9 @@ class PostController extends Controller
     {
         $post->loadMissing([
             'user:id,name',
-            'comments',
             'images'
         ]);
+        $post->loadCount('comments');
 
         return response()->json([
             'status' => 'success',
@@ -96,10 +95,10 @@ class PostController extends Controller
             'data' => $post->load('images'),
         ], 201);
     }
-    public function update(UpdatePostRequest $requset, Post $post)
+    public function update(UpdatePostRequest $request, Post $post)
     {
         Gate::authorize('update', $post);
-        $post->update($requset->validated());
+        $post->update($request->validated());
 
         return response()->json([
             'status' => 'success',
@@ -125,5 +124,5 @@ class PostController extends Controller
         ]);
 
     }
-    
+
 }

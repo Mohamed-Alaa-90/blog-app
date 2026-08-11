@@ -22,19 +22,19 @@ class ImageController extends Controller
         try {
 
             $createdImages = DB::transaction(function () use (&$uploadedImages, $post, $request) {
-                $ImagesCreated = [];
+                $imagesCreated  = [];
 
                 foreach ($request->file('images') as $image) {
                     $path = $image->store('posts', 'public');
 
                     $uploadedImages[] = $path;
 
-                    $ImagesCreated[] = $post->images()->create(
+                    $imagesCreated [] = $post->images()->create(
                         ['image' => $path]
                     );
                 }
 
-                return $ImagesCreated;
+                return $imagesCreated ;
 
             });
         } catch (\Throwable $e) {
@@ -70,6 +70,6 @@ class ImageController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Image deleted successfully',
-        ]);
+        ],200);
     }
 }
