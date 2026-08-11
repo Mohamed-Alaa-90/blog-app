@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CommentIndexRequest;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
 use App\Models\Comment;
@@ -25,13 +26,15 @@ class CommentController extends Controller
             'data' => $comment
         ], 201);
     }
-    public function index(Post $post)
+    public function index(CommentIndexRequest $request, Post $post)
     {
+        $perPage = $request->input('per_page', 10);
+
         $comments = $post->comments()
             ->select('id', 'post_id', 'user_id', 'content', 'created_at')
             ->with('user:id,name')
             ->latest()
-            ->paginate(10);
+            ->paginate($perPage);
         return response()->json([
             'status' => 'success',
             'message' => 'comment fetched successfully',
