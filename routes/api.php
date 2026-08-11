@@ -23,5 +23,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/posts/{post}/comments', [CommentController::class, 'store']);
     Route::get('/posts/{post}/comments', [CommentController::class, 'index']);
     Route::put('/posts/{post}/comments/{comment}', [CommentController::class, 'update'])->scopeBindings();
-    Route::post('/posts/{post}/comments/{comment}', [CommentController::class, 'destroy'])->scopeBindings();
+    Route::delete('/posts/{post}/comments/{comment}', [CommentController::class, 'destroy'])->scopeBindings();
+
+    //image
+    Route::delete('/posts/{post}/image/{image}', [PostController::class, 'destroyImage']);
 });

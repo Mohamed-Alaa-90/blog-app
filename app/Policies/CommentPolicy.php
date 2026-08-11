@@ -12,7 +12,7 @@ class CommentPolicy
     {
         return $user->id == $comment->user_id;
     }
-    public function destroy(User $user, Comment $comment)
+    public function delete(User $user, Comment $comment)
     {
         return $user->id == $comment->user_id;
     }

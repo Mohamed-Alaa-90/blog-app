@@ -8,10 +8,12 @@ use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
 
+use App\Models\PostImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Log;
 
 class PostController extends Controller
 {
@@ -123,5 +125,25 @@ class PostController extends Controller
         ]);
 
     }
+    public function destroyImage(Post $post, PostImage $image)
+    {
 
+        abort_unless($image->post_id === $post->id, 404);
+        Gate::authorize('manageImages', $post);
+        $path = $image->image;
+        $image->delete();
+        try {
+            Storage::disk('public')->delete($path);
+        } catch (\Throwable $th) {
+            Log::error('error to remove image', [
+                'image' => $path,
+                'error' => $th->getMessage()
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Image deleted successfully',
+        ]);
+    }
 }

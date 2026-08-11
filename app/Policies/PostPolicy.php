@@ -16,5 +16,9 @@ class PostPolicy
     {
         return $user->id === $post->user_id;
     }
+    public function manageImages(User $user, Post $post)
+    {
+        return $user->id === $post->user_id;
+    }
 
 }

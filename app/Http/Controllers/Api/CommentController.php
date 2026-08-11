@@ -50,7 +50,7 @@ class CommentController extends Controller
             'data' => $comment
         ]);
     }
-    public function destroy(Comment $comment, Post $post)
+    public function destroy(Post $post, Comment $comment, )
     {
         Gate::authorize('delete', $comment);
         $comment->delete();
