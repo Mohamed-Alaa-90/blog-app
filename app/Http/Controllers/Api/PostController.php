@@ -125,25 +125,5 @@ class PostController extends Controller
         ]);
 
     }
-    public function destroyImage(Post $post, PostImage $image)
-    {
-
-        abort_unless($image->post_id === $post->id, 404);
-        Gate::authorize('manageImages', $post);
-        $path = $image->image;
-        $image->delete();
-        try {
-            Storage::disk('public')->delete($path);
-        } catch (\Throwable $th) {
-            Log::error('error to remove image', [
-                'image' => $path,
-                'error' => $th->getMessage()
-            ]);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Image deleted successfully',
-        ]);
-    }
+    
 }
