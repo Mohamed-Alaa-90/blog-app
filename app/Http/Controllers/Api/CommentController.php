@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCommentRequest;
+use App\Http\Requests\UpdateCommentRequest;
+use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class CommentController extends Controller
 {
@@ -34,5 +37,26 @@ class CommentController extends Controller
             'message' => 'comment fetched successfully',
             'data' => $comments
         ], 200);
+    }
+    public function update(UpdateCommentRequest $request, Post $post, Comment $comment)
+    {
+        Gate::authorize('update', $comment);
+
+        $comment->update($request->validated());
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'comment updated successfully',
+            'data' => $comment
+        ]);
+    }
+    public function destroy(Comment $comment, Post $post)
+    {
+        Gate::authorize('delete', $comment);
+        $comment->delete();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'comment deleted successfully'
+        ]);
     }
 }
